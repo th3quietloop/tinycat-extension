@@ -226,8 +226,138 @@
     alertSleep: 'alert',
   };
 
+  /**
+   * Per-sprite animation configs. Each entry defines:
+   *   fps     — frame advance rate
+   *   frames  — array of patch arrays; each patch is {x, y, c} overriding the
+   *             base sprite pixel at (x,y) with palette code c ('0' = clear)
+   *   overlay — optional 'zzz' or 'stars' DOM overlay effect
+   *
+   * null = no sprite animation (CSS motion only).
+   */
+  const animations = {
+
+    // Breathing blink — eyes close on frame 3
+    idle: {
+      fps: 1.5,
+      frames: [
+        [],
+        [],
+        [],
+        [{ x: 2, y: 3, c: '1' }, { x: 6, y: 3, c: '1' }],
+      ],
+    },
+
+    // Eyes scan right → center → blink while stretching
+    tracking: {
+      fps: 1.2,
+      frames: [
+        [],
+        [{ x: 3, y: 3, c: '1' }, { x: 7, y: 3, c: '1' }, { x: 2, y: 3, c: '3' }, { x: 6, y: 3, c: '3' }],
+        [{ x: 3, y: 3, c: '1' }, { x: 7, y: 3, c: '1' }, { x: 2, y: 3, c: '3' }, { x: 6, y: 3, c: '3' }],
+        [{ x: 3, y: 3, c: '1' }, { x: 7, y: 3, c: '1' }],
+        [],
+        [],
+      ],
+    },
+
+    // Slow blink while crouched
+    stalking: {
+      fps: 1.5,
+      frames: [
+        [],
+        [],
+        [],
+        [{ x: 1, y: 2, c: '1' }, { x: 3, y: 2, c: '1' }],
+      ],
+    },
+
+    // Quick squint mid-lunge
+    pounce: {
+      fps: 3,
+      frames: [
+        [],
+        [{ x: 1, y: 2, c: '1' }, { x: 3, y: 2, c: '1' }],
+        [],
+      ],
+    },
+
+    // Too short for sprite frames — CSS jump only
+    startled: null,
+
+    // Nervous blink while peeking (black cat — wide white eyes)
+    scared: {
+      fps: 2,
+      frames: [
+        [],
+        [{ x: 1, y: 3, c: '1' }, { x: 4, y: 3, c: '1' }],
+        [],
+      ],
+    },
+
+    // Nervous blink while peeking (white cat — teal eyes)
+    scaredWhite: {
+      fps: 2,
+      frames: [
+        [],
+        [{ x: 1, y: 3, c: '1' }, { x: 4, y: 3, c: '1' }],
+        [],
+      ],
+    },
+
+    // Tongue lick cycle — tongue moves up to paw and back
+    grooming: {
+      fps: 2,
+      frames: [
+        [],
+        [{ x: 8, y: 5, c: '0' }, { x: 8, y: 4, c: '2' }],
+        [{ x: 8, y: 5, c: '0' }, { x: 8, y: 4, c: '2' }],
+        [],
+      ],
+    },
+
+    // Dizzy eyes cross inward + orbiting stars
+    dizzy: {
+      fps: 2.5,
+      overlay: 'stars',
+      frames: [
+        [],
+        [{ x: 2, y: 3, c: '1' }, { x: 6, y: 3, c: '1' }, { x: 3, y: 3, c: '6' }, { x: 5, y: 3, c: '6' }],
+        [],
+        [{ x: 2, y: 3, c: '1' }, { x: 6, y: 3, c: '1' }, { x: 3, y: 3, c: '6' }, { x: 5, y: 3, c: '6' }],
+      ],
+    },
+
+    // Ear twitch + floating Z's
+    sleep: {
+      fps: 0.8,
+      overlay: 'zzz',
+      frames: [
+        [],
+        [{ x: 0, y: 0, c: '0' }],
+        [],
+      ],
+    },
+
+    // Drowsy eye open/close cycle + floating Z's
+    alert: {
+      fps: 1,
+      overlay: 'zzz',
+      frames: [
+        [],
+        [],
+        [{ x: 2, y: 3, c: '1' }, { x: 6, y: 3, c: '1' }],
+        [{ x: 2, y: 3, c: '1' }, { x: 6, y: 3, c: '1' }],
+        [{ x: 2, y: 3, c: '1' }, { x: 6, y: 3, c: '1' }],
+        [],
+      ],
+    },
+
+  };
+
   window.TinyCat = window.TinyCat || {};
   window.TinyCat.palettes = palettes;
   window.TinyCat.sprites = sprites;
   window.TinyCat.stateSprites = stateSprites;
+  window.TinyCat.animations = animations;
 })();

@@ -15,6 +15,53 @@
   image-rendering: crisp-edges;
 }
 
+/* Overlay container for particle effects */
+#tinycat-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Floating Z's — sleep / alert sleep */
+.tinycat-zzz {
+  position: absolute;
+  top: -2px;
+  right: -5px;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  animation: tinycat-float-z 2s ease-in-out infinite;
+}
+
+@keyframes tinycat-float-z {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  15%  { opacity: 0.8; }
+  100% { transform: translateY(-25px) translateX(8px); opacity: 0; }
+}
+
+/* Orbiting stars — dizzy */
+.tinycat-star {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  margin-left: -5px;
+  font-size: 10px;
+  color: #FFD700;
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
+  animation: tinycat-orbit 1.2s linear infinite;
+}
+
+@keyframes tinycat-orbit {
+  0%   { transform: rotate(0deg) translateX(18px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(18px) rotate(-360deg); }
+}
+
 /* State label (debug) */
 #tinycat-label {
   text-align: center;

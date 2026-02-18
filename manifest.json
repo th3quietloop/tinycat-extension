@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TinyCat",
   "description": "A tiny interactive cat that lives on your screen and reacts to your cursor.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "permissions": ["storage"],
   "content_scripts": [
     {
