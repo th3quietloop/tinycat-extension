@@ -7,74 +7,12 @@
   z-index: 2147483647;
   pointer-events: none;
   will-change: transform;
-  transition: none;
 }
 
-#tinycat-body {
-  width: 48px;
-  height: 48px;
-  border-radius: 50% 50% 48% 48%;
-  position: relative;
-  will-change: transform, background-color;
-  transition: background-color 0.3s ease;
-  transform: scale(var(--cat-sx, 1), var(--cat-sy, 1));
-}
-
-/* Ears */
-.tinycat-ear {
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 14px solid var(--cat-color, #F5A623);
-  top: -10px;
-}
-
-.tinycat-ear-l {
-  left: 5px;
-  transform: rotate(-10deg);
-}
-
-.tinycat-ear-r {
-  right: 5px;
-  transform: rotate(10deg);
-}
-
-/* Face */
-.tinycat-face {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  gap: 10px;
-}
-
-/* Eyes */
-.tinycat-eye {
-  width: 8px;
-  height: 8px;
-  background: #1a1a1a;
-  border-radius: 50%;
-  position: relative;
-  transform: scaleY(var(--eye-squint, 1));
-  transition: transform 0.2s ease;
-}
-
-.tinycat-eye::after {
-  content: '';
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background: #fff;
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  transform: translate(
-    calc(-50% + var(--pupil-x, 0px)),
-    calc(-50% + var(--pupil-y, 0px))
-  );
+#tinycat-canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 /* State label (debug) */
