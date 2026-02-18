@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "TinyCat",
+  "description": "A tiny interactive cat that lives on your screen and reacts to your cursor.",
+  "version": "0.1.0",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "src/state-machine.js",
+        "src/cursor-tracker.js",
+        "src/renderer.js",
+        "src/cat.js",
+        "content.js"
+      ],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "TinyCat Settings"
+  },
+  "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

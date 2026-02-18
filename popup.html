@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+    <h1>TinyCat</h1>
+    <p class="subtitle">Your cursor companion</p>
+
+    <div class="toggle-row">
+      <span>Enabled</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle-enabled" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="state-display">
+      <span class="state-dot" id="state-dot"></span>
+      <span id="state-text">Active</span>
+    </div>
+
+    <div class="section">
+      <label class="label">Cat Speed</label>
+      <input type="range" id="speed-slider" min="1" max="10" value="5">
+    </div>
+
+    <div class="footer">v0.1.0</div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
