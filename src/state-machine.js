@@ -46,6 +46,10 @@
     [States.IDLE]: [
       { event: Events.CLICK,           target: States.STARTLED },
       { event: Events.CURSOR_FAST,     target: States.POUNCE,
+        guard: () => Math.random() < 0.4 },
+      { event: Events.NEAR_CURSOR,     target: States.STRETCHING,
+        guard: () => Math.random() < 0.3 },
+      { event: Events.NEAR_CURSOR,     target: States.POUNCE,
         guard: () => Math.random() < 0.25 },
       { event: Events.LONG_IDLE,       target: States.SLEEP },
       { event: Events.MEDIUM_IDLE,     target: States.STRETCHING,
@@ -57,6 +61,7 @@
 
     [States.STRETCHING]: [
       { event: Events.CLICK,           target: States.STARTLED },
+      { event: Events.CURSOR_FAST,     target: States.POUNCE },
       { event: Events.ANIMATION_DONE,  target: States.GROOMING,
         guard: () => Math.random() < 0.3 },
       { event: Events.ANIMATION_DONE,  target: States.IDLE },
@@ -122,10 +127,28 @@
       this._state = States.IDLE;
       this._listeners = [];
       this._timer = null;
+      this._disabledStates = new Set();
     }
 
     get state() {
       return this._state;
+    }
+
+    /**
+     * Set which states are disabled. Transitions to disabled states are
+     * skipped. IDLE can never be disabled.
+     */
+    setDisabledStates(states) {
+      this._disabledStates = new Set(states);
+      this._disabledStates.delete(States.IDLE);
+      // If currently in a disabled state, snap to IDLE
+      if (this._disabledStates.has(this._state)) {
+        var old = this._state;
+        this._state = States.IDLE;
+        this._clearTimer();
+        this._startTimerIfNeeded();
+        this._notify(this._state, old);
+      }
     }
 
     /**
@@ -142,18 +165,30 @@
      * Returns true if a transition occurred.
      */
     send(event) {
-      const candidates = transitions[this._state];
+      var candidates = transitions[this._state];
       if (!candidates) return false;
 
-      for (const t of candidates) {
+      for (var i = 0; i < candidates.length; i++) {
+        var t = candidates[i];
         if (t.event !== event) continue;
         if (t.guard && !t.guard()) continue;
+        if (this._disabledStates.has(t.target)) continue;
 
-        const oldState = this._state;
+        var oldState = this._state;
         this._state = t.target;
         this._clearTimer();
         this._startTimerIfNeeded();
         this._notify(this._state, oldState);
+        return true;
+      }
+
+      // Fallback: timed states always resolve — go to IDLE if target disabled
+      if (event === Events.ANIMATION_DONE && this._state !== States.IDLE) {
+        var old = this._state;
+        this._state = States.IDLE;
+        this._clearTimer();
+        this._startTimerIfNeeded();
+        this._notify(this._state, old);
         return true;
       }
       return false;
@@ -161,7 +196,7 @@
 
     /** Force-set state (for initialization or debugging). */
     reset(state) {
-      const old = this._state;
+      var old = this._state;
       this._state = state || States.IDLE;
       this._clearTimer();
       this._startTimerIfNeeded();
@@ -171,7 +206,7 @@
     }
 
     _startTimerIfNeeded() {
-      const duration = stateDurations[this._state];
+      var duration = stateDurations[this._state];
       if (duration) {
         this._timer = setTimeout(() => {
           this.send(Events.ANIMATION_DONE);
@@ -187,8 +222,8 @@
     }
 
     _notify(newState, oldState) {
-      for (const fn of this._listeners) {
-        fn(newState, oldState);
+      for (var i = 0; i < this._listeners.length; i++) {
+        this._listeners[i](newState, oldState);
       }
     }
   }

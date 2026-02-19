@@ -58,6 +58,15 @@
       this._started = false;
     }
 
+    /**
+     * Update idle timeout from settings slider (value in seconds).
+     * longIdleMs scales to 4× the medium idle.
+     */
+    setIdleTimeout(seconds) {
+      this._config.mediumIdleMs = seconds * 1000;
+      this._config.longIdleMs = seconds * 4000;
+    }
+
     start() {
       if (this._started) return;
       this._started = true;
@@ -87,8 +96,8 @@
     _tick() {
       if (!this._started) return;
 
-      const dx = this.x - this._prevX;
-      const dy = this.y - this._prevY;
+      var dx = this.x - this._prevX;
+      var dy = this.y - this._prevY;
       this.speed = Math.sqrt(dx * dx + dy * dy);
 
       if (this.speed > 0.5) {
@@ -116,11 +125,11 @@
     }
 
     _recordFastBurst() {
-      const now = Date.now();
+      var now = Date.now();
       this._fastBursts.push(now);
       // Prune old bursts
       this._fastBursts = this._fastBursts.filter(
-        t => now - t < this._config.fastBurstWindow
+        function (t) { return now - t < 5000; }
       );
       if (this._fastBursts.length >= this._config.fastBurstCount) {
         this._emit(Events.REPEATED_FAST);
@@ -129,7 +138,7 @@
     }
 
     _checkDirectionChange() {
-      let delta = Math.abs(this.angle - this._prevAngle);
+      var delta = Math.abs(this.angle - this._prevAngle);
       if (delta > 180) delta = 360 - delta;
       if (delta >= this._config.dirChangeAngle && this.speed > 4) {
         this._emit(Events.DIRECTION_CHANGE);
@@ -137,7 +146,7 @@
     }
 
     _trackCircularMotion() {
-      let delta = this.angle - this._prevAngle;
+      var delta = this.angle - this._prevAngle;
       if (delta > 180) delta -= 360;
       if (delta < -180) delta += 360;
       this._angleSamples.push(delta);
@@ -146,7 +155,7 @@
         this._angleSamples.shift();
       }
       if (this._angleSamples.length === this._config.circularSamples) {
-        const sum = this._angleSamples.reduce((a, b) => a + Math.abs(b), 0);
+        var sum = this._angleSamples.reduce(function (a, b) { return a + Math.abs(b); }, 0);
         if (sum >= this._config.circularAngleSum) {
           this._emit(Events.CIRCULAR_MOTION);
           this._angleSamples = [];
@@ -155,7 +164,7 @@
     }
 
     _checkIdle() {
-      const elapsed = Date.now() - this._lastMoveTime;
+      var elapsed = Date.now() - this._lastMoveTime;
 
       if (elapsed >= this._config.longIdleMs && !this._idleEmitted.long) {
         this._idleEmitted.long = true;
@@ -167,12 +176,12 @@
     }
 
     _checkProximity() {
-      const catPos = this._getCatPos();
+      var catPos = this._getCatPos();
       if (!catPos) return;
 
-      const dx = this.x - catPos.x;
-      const dy = this.y - catPos.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      var dx = this.x - catPos.x;
+      var dy = this.y - catPos.y;
+      var dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist < this._config.nearDistance) {
         this._emit(Events.NEAR_CURSOR);

@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -23,7 +26,7 @@
     </div>
 
     <div class="section">
-      <label class="label">Cat Style</label>
+      <span class="label">Cat Style</span>
       <div class="theme-picker">
         <button class="theme-btn selected" id="theme-black" data-theme="black">
           <span class="theme-preview theme-preview-black"></span>
@@ -35,6 +38,76 @@
         </button>
       </div>
     </div>
+
+    <div class="section">
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="label">Speed</span>
+          <span class="slider-val" id="speed-val">5</span>
+        </div>
+        <input type="range" class="range" id="speed-range" min="1" max="10" value="5">
+      </div>
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="label">Idle Timeout</span>
+          <span class="slider-val" id="idle-val">5s</span>
+        </div>
+        <input type="range" class="range" id="idle-range" min="3" max="15" value="5">
+      </div>
+    </div>
+
+    <div class="section">
+      <span class="label">Behaviors</span>
+      <div class="behaviors-grid">
+        <label class="beh-row">
+          <input type="checkbox" data-state="stretching" checked>
+          <span class="beh-check"></span>
+          <span>Stretching</span>
+        </label>
+        <label class="beh-row">
+          <input type="checkbox" data-state="pounce" checked>
+          <span class="beh-check"></span>
+          <span>Pounce</span>
+        </label>
+        <label class="beh-row">
+          <input type="checkbox" data-state="drinking" checked>
+          <span class="beh-check"></span>
+          <span>Drinking</span>
+        </label>
+        <label class="beh-row">
+          <input type="checkbox" data-state="startled" checked>
+          <span class="beh-check"></span>
+          <span>Startled</span>
+        </label>
+        <label class="beh-row">
+          <input type="checkbox" data-state="grooming" checked>
+          <span class="beh-check"></span>
+          <span>Grooming</span>
+        </label>
+        <label class="beh-row">
+          <input type="checkbox" data-state="falling" checked>
+          <span class="beh-check"></span>
+          <span>Falling</span>
+        </label>
+        <label class="beh-row">
+          <input type="checkbox" data-state="sleep" checked>
+          <span class="beh-check"></span>
+          <span>Sleep</span>
+        </label>
+        <label class="beh-row">
+          <input type="checkbox" data-state="dizzy" checked>
+          <span class="beh-check"></span>
+          <span>Dizzy</span>
+        </label>
+        <label class="beh-row">
+          <input type="checkbox" data-state="alertSleep" checked>
+          <span class="beh-check"></span>
+          <span>Alert Sleep</span>
+        </label>
+      </div>
+    </div>
+
+    <button class="reset-btn" id="reset-btn">Reset to Defaults</button>
 
     <div class="footer">v0.3.0</div>
   </div>

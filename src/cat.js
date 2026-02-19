@@ -2,22 +2,24 @@
  * TinyCat Controller
  *
  * Wires together the state machine, cursor tracker, and renderer.
- * Decides how each state affects the cat's target position and behavior.
+ * The cat lives in its corner and does its own thing. It reacts playfully
+ * when the cursor comes to it, but never chases the cursor across the screen.
  */
 (function () {
   'use strict';
 
   const { States, Events, StateMachine, CursorTracker, Renderer } = window.TinyCat;
 
-  const CHASE_STATES = new Set([States.POUNCE]);
-
+  /** Cat returns to its home corner in these states */
   const HOME_STATES = new Set([
     States.IDLE, States.STRETCHING, States.DRINKING,
     States.GROOMING, States.SLEEP, States.ALERT_SLEEP,
   ]);
 
   /** Cat freezes in place (no position change) */
-  const FREEZE_STATES = new Set([States.DIZZY]);
+  const FREEZE_STATES = new Set([
+    States.POUNCE, States.DIZZY, States.STARTLED, States.FALLING,
+  ]);
 
   /** Only notice fast cursor within this range (px) */
   const FAST_NOTICE_RANGE = 250;
@@ -34,7 +36,7 @@
       this._eventCooldowns = {};
       this._cooldownMs = {
         [Events.CURSOR_FAST]:      2000,
-        [Events.NEAR_CURSOR]:      1000,
+        [Events.NEAR_CURSOR]:      1500,
         [Events.CURSOR_AWAY]:      2000,
         [Events.MEDIUM_IDLE]:      1000,
         [Events.CIRCULAR_MOTION]:  2000,
@@ -61,8 +63,27 @@
       this._renderer.setTheme(theme);
     }
 
+    applySettings(settings) {
+      if (settings.catSpeed !== undefined) {
+        this._renderer.setSpeed(settings.catSpeed);
+      }
+      if (settings.idleTimeout !== undefined) {
+        this._tracker.setIdleTimeout(settings.idleTimeout);
+      }
+      if (settings.disabledStates !== undefined) {
+        this._sm.setDisabledStates(settings.disabledStates);
+      }
+    }
+
     _handleEvent(event) {
-      // Only notice fast cursor movements when they're nearby
+      // Track cursor proximity for purr visual (bypass cooldowns)
+      if (event === Events.NEAR_CURSOR) {
+        this._renderer.setCursorNear(true);
+      } else if (event === Events.CURSOR_AWAY) {
+        this._renderer.setCursorNear(false);
+      }
+
+      // Only notice fast cursor movements when nearby
       if (event === Events.CURSOR_FAST || event === Events.REPEATED_FAST) {
         var catPos = this._renderer.position;
         var dx = this._tracker.x - catPos.x;
@@ -82,14 +103,8 @@
     }
 
     _onStateEnter(state, _oldState) {
-      if (CHASE_STATES.has(state)) {
-        var offset = 40;
-        this._renderer.setTarget(
-          this._tracker.x - offset,
-          this._tracker.y - offset
-        );
-      } else if (FREEZE_STATES.has(state)) {
-        // Stay exactly where we are — set target to current position
+      if (FREEZE_STATES.has(state)) {
+        // Stay exactly where we are
         var pos = this._renderer.position;
         this._renderer.setTarget(pos.x, pos.y);
       } else if (HOME_STATES.has(state)) {

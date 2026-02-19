@@ -10,7 +10,7 @@
   const { States } = window.TinyCat;
 
   const PIXEL_SCALE = 5;  // CSS pixels per sprite pixel
-  const LERP_SPEED = 0.08;
+  const DEFAULT_LERP = 0.08;
 
   /** State labels shown below the cat */
   const stateLabels = {
@@ -48,6 +48,12 @@
       this._rafId = null;
       this._stateStartTime = 0;
 
+      // Configurable speed
+      this._lerpSpeed = DEFAULT_LERP;
+
+      // Cursor proximity for purr effect
+      this._cursorNear = false;
+
       // Animation frame tracking
       this._frameIndex = 0;
       this._lastFrameTime = 0;
@@ -55,25 +61,25 @@
     }
 
     get position() {
-      const sprite = this._getCurrentSprite();
-      const hw = sprite ? (sprite.w * PIXEL_SCALE) / 2 : 24;
-      const hh = sprite ? (sprite.h * PIXEL_SCALE) / 2 : 24;
+      var sprite = this._getCurrentSprite();
+      var hw = sprite ? (sprite.w * PIXEL_SCALE) / 2 : 24;
+      var hh = sprite ? (sprite.h * PIXEL_SCALE) / 2 : 24;
       return { x: this._x + hw, y: this._y + hh };
     }
 
     mount() {
       if (this._container) return;
 
-      const container = document.createElement('div');
+      var container = document.createElement('div');
       container.id = 'tinycat-container';
 
-      const canvas = document.createElement('canvas');
+      var canvas = document.createElement('canvas');
       canvas.id = 'tinycat-canvas';
 
-      const overlay = document.createElement('div');
+      var overlay = document.createElement('div');
       overlay.id = 'tinycat-overlay';
 
-      const label = document.createElement('div');
+      var label = document.createElement('div');
       label.id = 'tinycat-label';
       label.textContent = 'idle';
 
@@ -107,6 +113,16 @@
       this._overlayEl = null;
     }
 
+    /** Map speed slider (1–10) to lerp factor. */
+    setSpeed(value) {
+      this._lerpSpeed = 0.02 + (value - 1) * 0.02;
+    }
+
+    /** Track whether cursor is near the cat (for purr wobble). */
+    setCursorNear(near) {
+      this._cursorNear = near;
+    }
+
     setTheme(theme) {
       this._theme = theme;
       this._currentSpriteKey = this._getSpriteKey();
@@ -126,9 +142,9 @@
     }
 
     setTarget(x, y) {
-      const sprite = this._getCurrentSprite();
-      const hw = sprite ? (sprite.w * PIXEL_SCALE) / 2 : 24;
-      const hh = sprite ? (sprite.h * PIXEL_SCALE) / 2 : 24;
+      var sprite = this._getCurrentSprite();
+      var hw = sprite ? (sprite.w * PIXEL_SCALE) / 2 : 24;
+      var hh = sprite ? (sprite.h * PIXEL_SCALE) / 2 : 24;
       this._targetX = x - hw;
       this._targetY = y - hh;
     }
@@ -141,8 +157,8 @@
     // --- Private helpers ---
 
     _getSpriteKey() {
-      const { stateSprites } = window.TinyCat;
-      let key = stateSprites[this._currentState];
+      var stateSprites = window.TinyCat.stateSprites;
+      var key = stateSprites[this._currentState];
       if (this._currentState === States.FALLING && this._theme === 'white') {
         key = 'scaredWhite';
       }
@@ -150,23 +166,22 @@
     }
 
     _getCurrentSprite() {
-      const { sprites } = window.TinyCat;
-      return sprites[this._currentSpriteKey] || sprites.idle;
+      return window.TinyCat.sprites[this._currentSpriteKey] || window.TinyCat.sprites.idle;
     }
 
     _getAnimation() {
-      const { animations } = window.TinyCat;
-      return animations[this._currentSpriteKey] || null;
+      return window.TinyCat.animations[this._currentSpriteKey] || null;
     }
 
     /** Draw the base sprite with current animation frame patches applied. */
     _drawFrame() {
       if (!this._ctx) return;
 
-      const { sprites, palettes } = window.TinyCat;
-      const sprite = sprites[this._currentSpriteKey] || sprites.idle;
-      const palette = palettes[this._theme];
-      const anim = this._getAnimation();
+      var sprites = window.TinyCat.sprites;
+      var palettes = window.TinyCat.palettes;
+      var sprite = sprites[this._currentSpriteKey] || sprites.idle;
+      var palette = palettes[this._theme];
+      var anim = this._getAnimation();
 
       // Resize canvas to sprite dimensions (1 canvas px = 1 grid cell)
       this._canvas.width = sprite.w;
@@ -174,14 +189,14 @@
       this._canvas.style.width = (sprite.w * PIXEL_SCALE) + 'px';
       this._canvas.style.height = (sprite.h * PIXEL_SCALE) + 'px';
 
-      const ctx = this._ctx;
+      var ctx = this._ctx;
       ctx.clearRect(0, 0, sprite.w, sprite.h);
 
       // Draw base sprite
-      for (let y = 0; y < sprite.h; y++) {
-        const row = sprite.rows[y];
-        for (let x = 0; x < sprite.w; x++) {
-          const code = row[x];
+      for (var y = 0; y < sprite.h; y++) {
+        var row = sprite.rows[y];
+        for (var x = 0; x < sprite.w; x++) {
+          var code = row[x];
           if (code === '0') continue;
           ctx.fillStyle = palette[parseInt(code)];
           ctx.fillRect(x, y, 1, 1);
@@ -190,9 +205,9 @@
 
       // Apply animation frame patches
       if (anim && anim.frames && anim.frames.length > 0) {
-        const patches = anim.frames[this._frameIndex % anim.frames.length];
-        for (let i = 0; i < patches.length; i++) {
-          const p = patches[i];
+        var patches = anim.frames[this._frameIndex % anim.frames.length];
+        for (var i = 0; i < patches.length; i++) {
+          var p = patches[i];
           if (p.c === '0') {
             ctx.clearRect(p.x, p.y, 1, 1);
           } else {
@@ -209,7 +224,7 @@
       if (!this._overlayEl) return;
       this._overlayEl.innerHTML = '';
 
-      const anim = this._getAnimation();
+      var anim = this._getAnimation();
       if (!anim || !anim.overlay) return;
 
       if (anim.overlay === 'zzz') {
@@ -261,8 +276,8 @@
       }
 
       // Lerp position
-      this._x += (this._targetX - this._x) * LERP_SPEED;
-      this._y += (this._targetY - this._y) * LERP_SPEED;
+      this._x += (this._targetX - this._x) * this._lerpSpeed;
+      this._y += (this._targetY - this._y) * this._lerpSpeed;
 
       // Per-state motion effects
       var extraX = 0;
@@ -272,6 +287,11 @@
       switch (state) {
         case States.IDLE:
           extraY = Math.sin(elapsed / 800) * 2;
+          // Purr vibrate when cursor is nearby
+          if (this._cursorNear) {
+            extraX += Math.sin(elapsed / 30) * 0.4 + Math.sin(elapsed / 47) * 0.3;
+            extraY += Math.sin(elapsed / 37) * 0.3;
+          }
           break;
         case States.STRETCHING:
           extraY = Math.sin(elapsed / 500) * 4;
