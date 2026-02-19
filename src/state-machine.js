@@ -45,23 +45,25 @@
   const transitions = {
     [States.IDLE]: [
       { event: Events.CLICK,           target: States.STARTLED },
-      { event: Events.DIRECTION_CHANGE,target: States.STARTLED },
-      { event: Events.CURSOR_FAST,     target: States.POUNCE },
+      { event: Events.CURSOR_FAST,     target: States.POUNCE,
+        guard: () => Math.random() < 0.25 },
       { event: Events.LONG_IDLE,       target: States.SLEEP },
       { event: Events.MEDIUM_IDLE,     target: States.STRETCHING,
+        guard: () => Math.random() < 0.35 },
+      { event: Events.MEDIUM_IDLE,     target: States.GROOMING,
         guard: () => Math.random() < 0.5 },
       { event: Events.MEDIUM_IDLE,     target: States.DRINKING },
     ],
 
     [States.STRETCHING]: [
       { event: Events.CLICK,           target: States.STARTLED },
-      { event: Events.CURSOR_FAST,     target: States.POUNCE },
+      { event: Events.ANIMATION_DONE,  target: States.GROOMING,
+        guard: () => Math.random() < 0.3 },
       { event: Events.ANIMATION_DONE,  target: States.IDLE },
     ],
 
     [States.DRINKING]: [
       { event: Events.CLICK,           target: States.STARTLED },
-      { event: Events.CURSOR_FAST,     target: States.POUNCE },
       { event: Events.ANIMATION_DONE,  target: States.IDLE },
     ],
 
@@ -82,6 +84,8 @@
 
     [States.GROOMING]: [
       { event: Events.CLICK,           target: States.STARTLED },
+      { event: Events.ANIMATION_DONE,  target: States.STRETCHING,
+        guard: () => Math.random() < 0.2 },
       { event: Events.ANIMATION_DONE,  target: States.IDLE },
     ],
 

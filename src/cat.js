@@ -16,6 +16,12 @@
     States.GROOMING, States.SLEEP, States.ALERT_SLEEP,
   ]);
 
+  /** Cat freezes in place (no position change) */
+  const FREEZE_STATES = new Set([States.DIZZY]);
+
+  /** Only notice fast cursor within this range (px) */
+  const FAST_NOTICE_RANGE = 250;
+
   class Cat {
     constructor() {
       this._sm = new StateMachine();
@@ -27,8 +33,7 @@
 
       this._eventCooldowns = {};
       this._cooldownMs = {
-        [Events.CURSOR_FAST]:      500,
-        [Events.DIRECTION_CHANGE]: 800,
+        [Events.CURSOR_FAST]:      2000,
         [Events.NEAR_CURSOR]:      1000,
         [Events.CURSOR_AWAY]:      2000,
         [Events.MEDIUM_IDLE]:      1000,
@@ -57,10 +62,18 @@
     }
 
     _handleEvent(event) {
-      const cd = this._cooldownMs[event];
+      // Only notice fast cursor movements when they're nearby
+      if (event === Events.CURSOR_FAST || event === Events.REPEATED_FAST) {
+        var catPos = this._renderer.position;
+        var dx = this._tracker.x - catPos.x;
+        var dy = this._tracker.y - catPos.y;
+        if (Math.sqrt(dx * dx + dy * dy) > FAST_NOTICE_RANGE) return;
+      }
+
+      var cd = this._cooldownMs[event];
       if (cd) {
-        const now = Date.now();
-        const last = this._eventCooldowns[event] || 0;
+        var now = Date.now();
+        var last = this._eventCooldowns[event] || 0;
         if (now - last < cd) return;
         this._eventCooldowns[event] = now;
       }
@@ -70,11 +83,15 @@
 
     _onStateEnter(state, _oldState) {
       if (CHASE_STATES.has(state)) {
-        const offset = 40;
+        var offset = 40;
         this._renderer.setTarget(
           this._tracker.x - offset,
           this._tracker.y - offset
         );
+      } else if (FREEZE_STATES.has(state)) {
+        // Stay exactly where we are — set target to current position
+        var pos = this._renderer.position;
+        this._renderer.setTarget(pos.x, pos.y);
       } else if (HOME_STATES.has(state)) {
         this._renderer.goHome();
       }

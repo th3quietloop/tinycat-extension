@@ -12,10 +12,10 @@
 
   /** Thresholds (tweakable via settings later) */
   const DEFAULTS = {
-    fastSpeedThreshold:    18,   // px per sample — "fast" cursor
+    fastSpeedThreshold:    25,   // px per sample — "fast" cursor (high bar)
     dirChangeAngle:        120,  // degrees — sharp direction reversal
-    mediumIdleMs:          8000, // idle before stretching/drinking
-    longIdleMs:            30000,// idle before sleep
+    mediumIdleMs:          5000, // idle before autonomous activity
+    longIdleMs:            20000,// idle before sleep
     nearDistance:           150,  // px — "near the cat"
     awayDistance:           350,  // px — "away from the cat"
     circularSamples:       30,   // samples to detect circular motion
@@ -96,7 +96,6 @@
         this._checkDirectionChange();
         this._checkSpeed();
         this._trackCircularMotion();
-        this._emit(Events.CURSOR_MOVE);
       }
 
       this._checkIdle();
